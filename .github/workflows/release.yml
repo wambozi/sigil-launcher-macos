@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-14 # Apple Silicon runner
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build release binary
+        run: swift build -c release
+
+      - name: Create app bundle
+        run: |
+          APP_DIR="SigilLauncher.app/Contents/MacOS"
+          mkdir -p "$APP_DIR"
+          cp .build/release/SigilLauncher "$APP_DIR/"
+
+          # Info.plist
+          cat > SigilLauncher.app/Contents/Info.plist << 'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleExecutable</key>
+            <string>SigilLauncher</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.sigil.launcher</string>
+            <key>CFBundleName</key>
+            <string>Sigil Launcher</string>
+            <key>CFBundleVersion</key>
+            <string>${GITHUB_REF_NAME#v}</string>
+            <key>CFBundleShortVersionString</key>
+            <string>${GITHUB_REF_NAME#v}</string>
+            <key>LSMinimumSystemVersion</key>
+            <string>13.0</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+          </dict>
+          </plist>
+          PLIST
+
+          # Copy entitlements
+          cp SigilLauncher/SigilLauncher.entitlements SigilLauncher.app/Contents/
+
+      - name: Sign with ad-hoc signature
+        run: codesign --force --deep --sign - SigilLauncher.app
+
+      - name: Create zip archive
+        run: |
+          ditto -c -k --keepParent SigilLauncher.app SigilLauncher-macos-arm64.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: SigilLauncher-macos-arm64.zip
+          generate_release_notes: true
