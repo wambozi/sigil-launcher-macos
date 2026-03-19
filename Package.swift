@@ -9,7 +9,8 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "SigilLauncher",
-            path: "SigilLauncher"
+            path: "SigilLauncher",
+            exclude: ["SigilLauncher.entitlements"]
         ),
     ]
 )
