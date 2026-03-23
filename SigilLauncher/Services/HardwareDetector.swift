@@ -3,22 +3,30 @@ import Foundation
 import Metal
 #endif
 
-struct HardwareInfo {
-    let totalRAMGB: Int
-    let cpuCores: Int
-    let cpuArch: String
-    let diskAvailableGB: Int
-    let gpuName: String?
+public struct HardwareInfo {
+    public let totalRAMGB: Int
+    public let cpuCores: Int
+    public let cpuArch: String
+    public let diskAvailableGB: Int
+    public let gpuName: String?
+
+    public init(totalRAMGB: Int, cpuCores: Int, cpuArch: String, diskAvailableGB: Int, gpuName: String?) {
+        self.totalRAMGB = totalRAMGB
+        self.cpuCores = cpuCores
+        self.cpuArch = cpuArch
+        self.diskAvailableGB = diskAvailableGB
+        self.gpuName = gpuName
+    }
 }
 
-struct ResourceRecommendation {
-    let memoryGB: Int
-    let cpus: Int
-    let diskGB: Int
+public struct ResourceRecommendation {
+    public let memoryGB: Int
+    public let cpus: Int
+    public let diskGB: Int
 }
 
-enum HardwareDetector {
-    static func detect() -> HardwareInfo {
+public enum HardwareDetector {
+    public static func detect() -> HardwareInfo {
         // RAM via ProcessInfo
         let totalRAM = ProcessInfo.processInfo.physicalMemory
         let totalRAMGB = Int(totalRAM / (1024 * 1024 * 1024))
@@ -57,7 +65,7 @@ enum HardwareDetector {
         )
     }
 
-    static func recommend(for hardware: HardwareInfo) -> ResourceRecommendation {
+    public static func recommend(for hardware: HardwareInfo) -> ResourceRecommendation {
         let memoryGB = min(max(hardware.totalRAMGB / 2, 4), 12)
         let cpus = max(hardware.cpuCores / 2, 2)
         let diskGB = 20
@@ -69,7 +77,7 @@ enum HardwareDetector {
         )
     }
 
-    static func meetsMinimumRequirements(_ hardware: HardwareInfo) -> (Bool, String?) {
+    public static func meetsMinimumRequirements(_ hardware: HardwareInfo) -> (Bool, String?) {
         if hardware.totalRAMGB < 8 {
             return (false, "Sigil requires at least 8GB of system RAM. Detected: \(hardware.totalRAMGB)GB.")
         }

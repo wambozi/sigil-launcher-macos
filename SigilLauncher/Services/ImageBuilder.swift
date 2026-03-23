@@ -1,39 +1,41 @@
 import Foundation
 
-enum BuildState: String {
+public enum BuildState: String {
     case idle, building, complete, error
 }
 
 @MainActor
-class ImageBuilder: ObservableObject {
-    @Published var state: BuildState = .idle
-    @Published var progressMessage: String = ""
-    @Published var logOutput: String = ""
-    @Published var errorMessage: String?
+public class ImageBuilder: ObservableObject {
+    @Published public var state: BuildState = .idle
+    @Published public var progressMessage: String = ""
+    @Published public var logOutput: String = ""
+    @Published public var errorMessage: String?
 
-    static let imagesDirectory: URL = {
+    public init() {}
+
+    public static let imagesDirectory: URL = {
         let home = FileManager.default.homeDirectoryForCurrentUser
         return home.appendingPathComponent(".sigil/images")
     }()
 
-    static let profileDirectory: URL = {
+    public static let profileDirectory: URL = {
         let home = FileManager.default.homeDirectoryForCurrentUser
         return home.appendingPathComponent(".sigil/profiles/default")
     }()
 
     /// Check if a built image exists
-    var imageExists: Bool {
+    public var imageExists: Bool {
         FileManager.default.fileExists(atPath: Self.imagesDirectory.appendingPathComponent("vmlinuz").path)
     }
 
     /// Check if Nix is installed
-    static func nixPath() -> String? {
+    public static func nixPath() -> String? {
         let paths = ["/nix/var/nix/profiles/default/bin/nix", "/usr/local/bin/nix", "/opt/homebrew/bin/nix"]
         return paths.first { FileManager.default.fileExists(atPath: $0) }
     }
 
     /// Generate a flake.nix wrapper that imports sigil-os and applies tool selections
-    func generateFlake(profile: LauncherProfile, sigilOSPath: String) throws {
+    public func generateFlake(profile: LauncherProfile, sigilOSPath: String) throws {
         let dir = Self.profileDirectory
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
 
@@ -60,7 +62,7 @@ class ImageBuilder: ObservableObject {
     }
 
     /// Build the VM image from the generated flake
-    func build(profile: LauncherProfile, sigilOSPath: String = "github:sigil-tech/sigil-os") async throws {
+    public func build(profile: LauncherProfile, sigilOSPath: String = "github:sigil-tech/sigil-os") async throws {
         guard let nix = Self.nixPath() else {
             throw ImageBuilderError.nixNotInstalled
         }

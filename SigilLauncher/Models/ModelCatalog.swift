@@ -1,19 +1,19 @@
 import Foundation
 
-struct ModelInfo: Codable, Identifiable {
-    let id: String
-    let name: String
-    let description: String
-    let sizeGB: Double
-    let minRAMGB: Double
-    let quantization: String
-    let parameters: String
-    let downloadURL: String
-    let filename: String
+public struct ModelInfo: Codable, Identifiable {
+    public let id: String
+    public let name: String
+    public let description: String
+    public let sizeGB: Double
+    public let minRAMGB: Double
+    public let quantization: String
+    public let parameters: String
+    public let downloadURL: String
+    public let filename: String
 }
 
-enum ModelCatalog {
-    static let models: [ModelInfo] = [
+public enum ModelCatalog {
+    public static let models: [ModelInfo] = [
         ModelInfo(
             id: "qwen2.5-1.5b-q4",
             name: "Qwen 2.5 1.5B",
@@ -45,7 +45,7 @@ enum ModelCatalog {
 
     /// Returns models that can run within the given VM RAM allocation.
     /// Reserves 2GB for OS + daemon overhead.
-    static func availableModels(forVMRAMGB vmRAM: Int) -> [ModelInfo] {
+    public static func availableModels(forVMRAMGB vmRAM: Int) -> [ModelInfo] {
         let availableForModel = Double(vmRAM) - 2.0
         return models.filter { $0.minRAMGB <= Double(vmRAM) && $0.sizeGB <= availableForModel }
     }

@@ -4,12 +4,12 @@ import Combine
 
 /// Manages the VM lifecycle: create, start, stop, and health monitoring.
 @MainActor
-class VMManager: ObservableObject {
-    @Published var state: VMState = .stopped
-    @Published var errorMessage: String?
-    @Published var sshReady = false
-    @Published var daemonReady = false
-    @Published var imageBuilder = ImageBuilder()
+public class VMManager: ObservableObject {
+    @Published public var state: VMState = .stopped
+    @Published public var errorMessage: String?
+    @Published public var sshReady = false
+    @Published public var daemonReady = false
+    @Published public var imageBuilder = ImageBuilder()
 
     private var virtualMachine: VZVirtualMachine?
     private var profile: LauncherProfile
@@ -18,17 +18,17 @@ class VMManager: ObservableObject {
     private var vmStateObservation: NSKeyValueObservation?
 
     /// Whether a built VM image exists on disk
-    var imageReady: Bool {
+    public var imageReady: Bool {
         imageBuilder.imageExists
     }
 
-    init() {
+    public init() {
         self.profile = LauncherProfile.load()
     }
 
     // MARK: - Lifecycle
 
-    func start() async {
+    public func start() async {
         guard state == .stopped || state == .error else { return }
 
         // Verify image exists before attempting to start

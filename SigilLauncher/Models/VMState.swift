@@ -1,14 +1,14 @@
 import Foundation
 
 /// Represents the lifecycle state of the NixOS virtual machine.
-enum VMState: String, Equatable {
+public enum VMState: String, Equatable {
     case stopped
     case starting
     case running
     case stopping
     case error
 
-    var displayName: String {
+    public var displayName: String {
         switch self {
         case .stopped: return "Stopped"
         case .starting: return "Starting..."
@@ -18,7 +18,7 @@ enum VMState: String, Equatable {
         }
     }
 
-    var isTransitioning: Bool {
+    public var isTransitioning: Bool {
         self == .starting || self == .stopping
     }
 }

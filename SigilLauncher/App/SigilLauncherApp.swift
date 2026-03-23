@@ -1,4 +1,5 @@
 import SwiftUI
+import SigilLauncherLib
 
 @main
 struct SigilLauncherApp: App {

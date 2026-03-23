@@ -1,50 +1,50 @@
 import Foundation
 
 /// Persisted launcher settings stored at ~/.sigil/launcher/settings.json.
-struct LauncherProfile: Codable {
+public struct LauncherProfile: Codable {
     /// RAM allocated to the VM in bytes.
-    var memorySize: UInt64
+    public var memorySize: UInt64
 
     /// Number of CPU cores allocated to the VM.
-    var cpuCount: Int
+    public var cpuCount: Int
 
     /// Host directory to mount as /workspace in the VM.
-    var workspacePath: String
+    public var workspacePath: String
 
     /// Path to the VM disk image.
-    var diskImagePath: String
+    public var diskImagePath: String
 
     /// Path to the kernel (vmlinuz).
-    var kernelPath: String
+    public var kernelPath: String
 
     /// Path to the initrd.
-    var initrdPath: String
+    public var initrdPath: String
 
     /// SSH port forwarded from localhost to the VM.
-    var sshPort: UInt16
+    public var sshPort: UInt16
 
     /// The kernel command line arguments.
-    var kernelCommandLine: String
+    public var kernelCommandLine: String
 
     /// Editor to install in the VM: "vscode", "neovim", "both", or "none".
-    var editor: String
+    public var editor: String
 
     /// Container engine: "docker" or "none".
-    var containerEngine: String
+    public var containerEngine: String
 
     /// Default shell: "zsh" or "bash".
-    var shell: String
+    public var shell: String
 
     /// Notification/suggestion level (0=silent, 1=digest, 2=ambient, 3=conversational, 4=autonomous).
-    var notificationLevel: Int
+    public var notificationLevel: Int
 
     /// Selected local model ID from the catalog, or nil for cloud-only inference.
-    var modelId: String?
+    public var modelId: String?
 
     /// Path to the downloaded model file on disk, or nil if no local model.
-    var modelPath: String?
+    public var modelPath: String?
 
-    enum CodingKeys: String, CodingKey {
+    public enum CodingKeys: String, CodingKey {
         case memorySize
         case cpuCount
         case workspacePath
@@ -61,7 +61,7 @@ struct LauncherProfile: Codable {
         case modelPath
     }
 
-    init(
+    public init(
         memorySize: UInt64,
         cpuCount: Int,
         workspacePath: String,
@@ -93,7 +93,7 @@ struct LauncherProfile: Codable {
         self.modelPath = modelPath
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         memorySize = try container.decode(UInt64.self, forKey: .memorySize)
         cpuCount = try container.decode(Int.self, forKey: .cpuCount)
@@ -113,14 +113,14 @@ struct LauncherProfile: Codable {
     }
 
     /// Returns true if any field that requires a VM rebuild has changed.
-    func needsRebuild(comparedTo other: LauncherProfile) -> Bool {
+    public func needsRebuild(comparedTo other: LauncherProfile) -> Bool {
         return editor != other.editor ||
                containerEngine != other.containerEngine ||
                shell != other.shell ||
                modelId != other.modelId
     }
 
-    static let defaultProfile = LauncherProfile(
+    public static let defaultProfile = LauncherProfile(
         memorySize: 4 * 1024 * 1024 * 1024, // 4 GB
         cpuCount: 2,
         workspacePath: NSHomeDirectory() + "/workspace",
@@ -131,12 +131,12 @@ struct LauncherProfile: Codable {
         kernelCommandLine: "console=hvc0 root=/dev/vda rw"
     )
 
-    static var settingsURL: URL {
+    public static var settingsURL: URL {
         let base = FileManager.default.homeDirectoryForCurrentUser
         return base.appendingPathComponent(".sigil/launcher/settings.json")
     }
 
-    static func load() -> LauncherProfile {
+    public static func load() -> LauncherProfile {
         guard let data = try? Data(contentsOf: settingsURL),
               let profile = try? JSONDecoder().decode(LauncherProfile.self, from: data) else {
             return .defaultProfile
@@ -144,7 +144,7 @@ struct LauncherProfile: Codable {
         return profile
     }
 
-    func save() throws {
+    public func save() throws {
         let dir = LauncherProfile.settingsURL.deletingLastPathComponent()
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let data = try JSONEncoder().encode(self)
