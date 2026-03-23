@@ -54,6 +54,16 @@ enum VMConfiguration {
         profileShare.share = VZSingleDirectoryShare(directory: profileDirectory)
         shares.append(profileShare)
 
+        // /sigil-models — local LLM model files (read-only)
+        let modelsDir = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent(".sigil/models")
+        if FileManager.default.fileExists(atPath: modelsDir.path) {
+            let modelsShare = VZVirtioFileSystemDeviceConfiguration(tag: "sigil-models")
+            let modelsDirectory = VZSharedDirectory(url: modelsDir, readOnly: true)
+            modelsShare.share = VZSingleDirectoryShare(directory: modelsDirectory)
+            shares.append(modelsShare)
+        }
+
         config.directorySharingDevices = shares
 
         // Entropy device (required for Linux guests)

@@ -9,10 +9,18 @@ class VMManager: ObservableObject {
     @Published var errorMessage: String?
     @Published var sshReady = false
     @Published var daemonReady = false
+    @Published var imageBuilder = ImageBuilder()
 
     private var virtualMachine: VZVirtualMachine?
     private var profile: LauncherProfile
     private var healthCheckTask: Task<Void, Never>?
+    private var continuousHealthTask: Task<Void, Never>?
+    private var vmStateObservation: NSKeyValueObservation?
+
+    /// Whether a built VM image exists on disk
+    var imageReady: Bool {
+        imageBuilder.imageExists
+    }
 
     init() {
         self.profile = LauncherProfile.load()
@@ -22,6 +30,14 @@ class VMManager: ObservableObject {
 
     func start() async {
         guard state == .stopped || state == .error else { return }
+
+        // Verify image exists before attempting to start
+        guard imageReady else {
+            state = .error
+            errorMessage = "No VM image found. Build an image first."
+            return
+        }
+
         state = .starting
         errorMessage = nil
         sshReady = false
@@ -31,6 +47,20 @@ class VMManager: ObservableObject {
             let config = try VMConfiguration.build(from: profile)
             let vm = VZVirtualMachine(configuration: config)
             self.virtualMachine = vm
+
+            // Observe VM state for crash detection
+            vmStateObservation = vm.observe(\.state, options: [.new]) { [weak self] vm, change in
+                DispatchQueue.main.async {
+                    guard let self = self else { return }
+                    if vm.state == .stopped && self.state == .running {
+                        self.state = .error
+                        self.errorMessage = "VM stopped unexpectedly"
+                        self.sshReady = false
+                        self.daemonReady = false
+                        self.continuousHealthTask?.cancel()
+                    }
+                }
+            }
 
             try await vm.start()
             state = .running
@@ -49,6 +79,9 @@ class VMManager: ObservableObject {
         guard state == .running else { return }
         state = .stopping
         healthCheckTask?.cancel()
+        continuousHealthTask?.cancel()
+        vmStateObservation?.invalidate()
+        vmStateObservation = nil
 
         guard let vm = virtualMachine else {
             state = .stopped
@@ -129,6 +162,31 @@ class VMManager: ObservableObject {
         // Bootstrap TLS credentials on first run
         if daemonReady {
             await bootstrapCredentials()
+
+            // Start continuous health monitoring
+            continuousHealthTask = Task {
+                await monitorHealth()
+            }
+        }
+    }
+
+    /// Continuously monitors daemon health every 30 seconds.
+    /// Sets daemonReady to false after 3 consecutive failures.
+    private func monitorHealth() async {
+        var consecutiveFailures = 0
+        while !Task.isCancelled && state == .running {
+            try? await Task.sleep(nanoseconds: 30_000_000_000) // 30 seconds
+            guard !Task.isCancelled else { break }
+
+            if await checkDaemon() {
+                consecutiveFailures = 0
+            } else {
+                consecutiveFailures += 1
+                if consecutiveFailures >= 3 {
+                    daemonReady = false
+                    errorMessage = "Daemon health check failed"
+                }
+            }
         }
     }
 
@@ -222,6 +280,17 @@ class VMManager: ObservableObject {
             try settingsData.write(to: shellConfigDir.appendingPathComponent("daemon-settings.json"))
         } catch {
             print("Credential bootstrap failed: \(error)")
+        }
+    }
+
+    // MARK: - Image Building
+
+    /// Rebuild the VM image using the current profile
+    func rebuild() async {
+        do {
+            try await imageBuilder.build(profile: profile)
+        } catch {
+            // Error state is already set on imageBuilder
         }
     }
 
