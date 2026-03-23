@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct SetupWizard: View {
+public struct SetupWizard: View {
     @State private var step = 0
     @State private var hardware: HardwareInfo
     @State private var recommendation: ResourceRecommendation
@@ -12,9 +12,9 @@ struct SetupWizard: View {
 
     @ObservedObject var imageBuilder: ImageBuilder
 
-    var onComplete: (LauncherProfile) -> Void
+    public var onComplete: (LauncherProfile) -> Void
 
-    init(imageBuilder: ImageBuilder, onComplete: @escaping (LauncherProfile) -> Void) {
+    public init(imageBuilder: ImageBuilder, onComplete: @escaping (LauncherProfile) -> Void) {
         self.imageBuilder = imageBuilder
         self.onComplete = onComplete
         let hw = HardwareDetector.detect()
@@ -22,7 +22,7 @@ struct SetupWizard: View {
         self._recommendation = State(initialValue: HardwareDetector.recommend(for: hw))
     }
 
-    var body: some View {
+    public var body: some View {
         VStack(spacing: 0) {
             // Step indicator
             HStack(spacing: 4) {

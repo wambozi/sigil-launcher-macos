@@ -1,11 +1,13 @@
 import SwiftUI
 
-struct LauncherView: View {
+public struct LauncherView: View {
     @EnvironmentObject var vm: VMManager
     @State private var showQuitConfirmation = false
     @State private var showBuildLog = false
 
-    var body: some View {
+    public init() {}
+
+    public var body: some View {
         VStack(spacing: 20) {
             // Status header
             HStack {
@@ -210,11 +212,11 @@ struct LauncherView: View {
     }
 }
 
-struct ReadinessIndicator: View {
-    let label: String
-    let ready: Bool
+public struct ReadinessIndicator: View {
+    public let label: String
+    public let ready: Bool
 
-    var body: some View {
+    public var body: some View {
         HStack(spacing: 4) {
             Circle()
                 .fill(ready ? Color.green : Color.gray.opacity(0.3))

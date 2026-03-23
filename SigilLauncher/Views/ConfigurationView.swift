@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ConfigurationView: View {
+public struct ConfigurationView: View {
     @EnvironmentObject var vm: VMManager
 
     @State private var memoryGB: Double
@@ -16,7 +16,7 @@ struct ConfigurationView: View {
     /// Snapshot of the saved profile to detect rebuild-requiring changes
     @State private var savedProfile: LauncherProfile
 
-    init() {
+    public init() {
         let profile = LauncherProfile.load()
         _memoryGB = State(initialValue: Double(profile.memorySize) / (1024 * 1024 * 1024))
         _cpuCores = State(initialValue: Double(profile.cpuCount))
@@ -53,7 +53,7 @@ struct ConfigurationView: View {
         ModelCatalog.availableModels(forVMRAMGB: Int(memoryGB))
     }
 
-    var body: some View {
+    public var body: some View {
         Form {
             Section("Resources") {
                 VStack(alignment: .leading) {

@@ -217,11 +217,11 @@ public class ImageBuilder: ObservableObject {
     }
 }
 
-enum ImageBuilderError: LocalizedError {
+public enum ImageBuilderError: LocalizedError {
     case nixNotInstalled
     case buildFailed(exitCode: Int)
 
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case .nixNotInstalled:
             return "Nix is not installed. Install it from https://nixos.org/download/"

@@ -10,7 +10,7 @@ let package = Package(
         .target(
             name: "SigilLauncherLib",
             path: "SigilLauncher",
-            exclude: ["SigilLauncher.entitlements", "App/SigilLauncherApp.swift"],
+            exclude: ["SigilLauncher.entitlements", "App"],
             sources: [
                 "Models/LauncherProfile.swift",
                 "Models/ModelCatalog.swift",
@@ -29,8 +29,7 @@ let package = Package(
         .executableTarget(
             name: "SigilLauncher",
             dependencies: ["SigilLauncherLib"],
-            path: "SigilLauncher/App",
-            sources: ["SigilLauncherApp.swift"]
+            path: "Sources/SigilLauncherApp"
         ),
         .testTarget(
             name: "SigilLauncherTests",

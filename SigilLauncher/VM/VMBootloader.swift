@@ -2,9 +2,9 @@ import Foundation
 import Virtualization
 
 /// Creates a VZLinuxBootLoader for direct kernel boot of the NixOS image.
-enum VMBootloader {
+public enum VMBootloader {
 
-    static func create(from profile: LauncherProfile) throws -> VZLinuxBootLoader {
+    public static func create(from profile: LauncherProfile) throws -> VZLinuxBootLoader {
         let kernelURL = URL(fileURLWithPath: profile.kernelPath)
         let initrdURL = URL(fileURLWithPath: profile.initrdPath)
 
@@ -23,7 +23,7 @@ enum VMBootloader {
     }
 }
 
-enum VMError: LocalizedError {
+public enum VMError: LocalizedError {
     case missingKernel(String)
     case missingInitrd(String)
     case missingDiskImage(String)
@@ -31,7 +31,7 @@ enum VMError: LocalizedError {
     case sshTimeout
     case daemonTimeout
 
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case .missingKernel(let path): return "Kernel not found at \(path)"
         case .missingInitrd(let path): return "Initrd not found at \(path)"

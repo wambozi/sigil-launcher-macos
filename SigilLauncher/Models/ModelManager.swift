@@ -1,16 +1,16 @@
 import Foundation
 
-class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
-    @Published var isDownloading = false
-    @Published var downloadProgress: Double = 0.0
-    @Published var error: String?
+public class ModelManager: NSObject, ObservableObject, URLSessionDownloadDelegate {
+    @Published public var isDownloading = false
+    @Published public var downloadProgress: Double = 0.0
+    @Published public var error: String?
 
     private var downloadTask: URLSessionDownloadTask?
     private var destinationURL: URL?
     private var progressHandler: ((Double) -> Void)?
     private var completionHandler: ((Result<URL, Error>) -> Void)?
 
-    static let modelsDirectory: URL = {
+    public static let modelsDirectory: URL = {
         let home = FileManager.default.homeDirectoryForCurrentUser
         return home.appendingPathComponent(".sigil/models")
     }()

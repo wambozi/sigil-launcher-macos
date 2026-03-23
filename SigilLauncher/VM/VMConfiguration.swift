@@ -2,9 +2,9 @@ import Foundation
 import Virtualization
 
 /// Builds a VZVirtualMachineConfiguration from a LauncherProfile.
-enum VMConfiguration {
+public enum VMConfiguration {
 
-    static func build(from profile: LauncherProfile) throws -> VZVirtualMachineConfiguration {
+    public static func build(from profile: LauncherProfile) throws -> VZVirtualMachineConfiguration {
         let config = VZVirtualMachineConfiguration()
 
         // CPU & Memory

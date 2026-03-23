@@ -75,7 +75,7 @@ public class VMManager: ObservableObject {
         }
     }
 
-    func stop() async {
+    public func stop() async {
         guard state == .running else { return }
         state = .stopping
         healthCheckTask?.cancel()
@@ -286,7 +286,7 @@ public class VMManager: ObservableObject {
     // MARK: - Image Building
 
     /// Rebuild the VM image using the current profile
-    func rebuild() async {
+    public func rebuild() async {
         do {
             try await imageBuilder.build(profile: profile)
         } catch {
@@ -296,7 +296,7 @@ public class VMManager: ObservableObject {
 
     // MARK: - Shell Launch
 
-    func launchShell() {
+    public func launchShell() {
         guard daemonReady else { return }
 
         let process = Process()
@@ -324,10 +324,10 @@ public class VMManager: ObservableObject {
 
     // MARK: - Configuration
 
-    func updateProfile(_ newProfile: LauncherProfile) {
+    public func updateProfile(_ newProfile: LauncherProfile) {
         self.profile = newProfile
         try? newProfile.save()
     }
 
-    var currentProfile: LauncherProfile { profile }
+    public var currentProfile: LauncherProfile { profile }
 }
